@@ -1,0 +1,6 @@
+@VolleyballManager_HostAddress = http://localhost:5182
+
+GET {{VolleyballManager_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
