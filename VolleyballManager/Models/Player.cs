@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace VolleyballManager.Models
 {
@@ -14,7 +15,7 @@ namespace VolleyballManager.Models
 
         [Required]
         public int TeamId { get; set; }
-
+        [JsonIgnore]
         public Team? Team { get; set; }
     }
 }
