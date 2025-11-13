@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VolleyballManager.Data;
 using VolleyballManager.Models;
@@ -19,20 +19,20 @@ namespace VolleyballManager.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Player>>> GetPlayers()
         {
-            return await _context.Players.Include(p => p.Team).ToListAsync();
+            return await _context.Players
+        .Include(p => p.Team) // 🔹 betölti a csapatot is
+        .ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Player>> GetPlayer(int id)
         {
             var player = await _context.Players
-                .Include(p => p.Team)
-                .FirstOrDefaultAsync(p => p.Id == id);
+        .Include(p => p.Team)
+        .FirstOrDefaultAsync(p => p.Id == id);
 
             if (player == null)
-            {
                 return NotFound();
-            }
 
             return player;
         }
@@ -42,7 +42,7 @@ namespace VolleyballManager.Controllers
         {
             var teamExists = await _context.Teams.AnyAsync(t => t.Id == player.TeamId);
             if (!teamExists)
-                return BadRequest("A megadott csapat nem l�tezik.");
+                return BadRequest("A megadott csapat nem létezik.");
 
             _context.Players.Add(player);
             await _context.SaveChangesAsync();
@@ -58,7 +58,7 @@ namespace VolleyballManager.Controllers
 
             var teamExists = await _context.Teams.AnyAsync(t => t.Id == player.TeamId);
             if (!teamExists)
-                return BadRequest("A megadott csapat nem l�tezik.");
+                return BadRequest("A megadott csapat nem létezik.");
 
             _context.Entry(player).State = EntityState.Modified;
             await _context.SaveChangesAsync();
