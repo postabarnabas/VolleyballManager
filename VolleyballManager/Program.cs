@@ -1,5 +1,6 @@
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Text.Json.Serialization;
 using VolleyballManager.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddControllers()
     {
         opts.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
         opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
