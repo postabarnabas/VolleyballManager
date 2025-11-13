@@ -15,7 +15,7 @@ namespace VolleyballManager.Models
 
         [Required]
         public int TeamId { get; set; }
-        [JsonIgnore]
+       // [JsonIgnore]
         public Team? Team { get; set; }
     }
 }
