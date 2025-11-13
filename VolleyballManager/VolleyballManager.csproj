@@ -20,4 +20,9 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\VolleyballManager.Client\Pages\Component.razor" Link="Component.razor" />
+    <None Include="..\VolleyballManager.Client\Pages\Component1.razor" Link="Component1.razor" />
+  </ItemGroup>
+
 </Project>
