@@ -1,0 +1,36 @@
+﻿@page "/teams/add"
+@using VolleyballManager.Client.Models
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<h3>Add New Team</h3>
+
+<div class="mb-3">
+    <label>Name:</label>
+    <input @bind="team.Name" class="form-control" />
+</div>
+<div class="mb-3">
+    <label>City:</label>
+    <input @bind="team.City" class="form-control" />
+</div>
+<div class="mb-3">
+    <label>Coach:</label>
+    <input @bind="team.Coach" class="form-control" />
+</div>
+
+<button class="btn btn-primary" @onclick="SaveTeam">Save</button>
+<button class="btn btn-secondary" @onclick="@(() => Nav.NavigateTo("/teams"))">Cancel</button>
+
+
+@code {
+    private Team team = new();
+
+    private async Task SaveTeam()
+    {
+        var response = await Http.PostAsJsonAsync("api/teams", team);
+        if (response.IsSuccessStatusCode)
+        {
+            Nav.NavigateTo("/teams");
+        }
+    }
+}

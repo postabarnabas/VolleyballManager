@@ -1,0 +1,58 @@
+﻿@page "/players/add"
+@using VolleyballManager.Client.Models
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<h3>Add New Player</h3>
+
+<div class="mb-3">
+    <label>Full Name:</label>
+    <input @bind="player.FullName" class="form-control" />
+</div>
+
+<div class="mb-3">
+    <label>Position:</label>
+    <select @bind="player.Position" class="form-control">
+        @foreach (var pos in Enum.GetValues<PlayerPosition>())
+        {
+            <option value="@pos">@pos</option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Team:</label>
+    <select @bind="player.TeamId" class="form-control">
+        <option value="0">-- Select Team --</option>
+        @if (teams != null)
+        {
+            @foreach (var team in teams)
+            {
+                <option value="@team.Id">@team.Name</option>
+            }
+        }
+    </select>
+</div>
+
+<button class="btn btn-primary" @onclick="SavePlayer">Save</button>
+<button class="btn btn-secondary" @onclick="@(() => Nav.NavigateTo("/players"))">Cancel</button>
+
+@code {
+    private Player player = new();
+    private List<Team>? teams;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Betölti a csapatokat a legördülőhöz
+        teams = await Http.GetFromJsonAsync<List<Team>>("api/teams");
+    }
+
+    private async Task SavePlayer()
+    {
+        var response = await Http.PostAsJsonAsync("api/players", player);
+        if (response.IsSuccessStatusCode)
+        {
+            Nav.NavigateTo("/players");
+        }
+    }
+}

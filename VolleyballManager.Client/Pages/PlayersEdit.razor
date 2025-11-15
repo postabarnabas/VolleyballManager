@@ -1,0 +1,71 @@
+﻿@page "/players/edit/{Id:int}"
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@using VolleyballManager.Client.Models
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<h3>Edit Player</h3>
+
+@if (player == null)
+{
+    <p><em>Loading player data...</em></p>
+}
+else
+{
+    <div class="mb-3">
+        <label>Full Name:</label>
+        <input @bind="player.FullName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Position:</label>
+        <select @bind="player.Position" class="form-select">
+            @foreach (var pos in Enum.GetValues<PlayerPosition>())
+            {
+                <option value="@pos">@pos</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Team ID:</label>
+        <input type="number" @bind="player.TeamId" class="form-control" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="UpdatePlayer">Save Changes</button>
+    <button class="btn btn-secondary" @onclick="@(() => Nav.NavigateTo("/players"))">Cancel</button>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Player? player;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        var response = await Http.GetAsync($"api/players/{Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            var stream = await response.Content.ReadAsStreamAsync();
+            player = await JsonSerializer.DeserializeAsync<Player>(stream, options);
+        }
+    }
+
+
+    private async Task UpdatePlayer()
+    {
+        var response = await Http.PutAsJsonAsync($"api/players/{Id}", player);
+        if (response.IsSuccessStatusCode)
+        {
+            Nav.NavigateTo("/players");
+        }
+    }
+}

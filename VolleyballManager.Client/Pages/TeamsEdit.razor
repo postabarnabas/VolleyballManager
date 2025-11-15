@@ -1,0 +1,48 @@
+﻿@page "/teams/edit/{id:int}"
+@using VolleyballManager.Client.Models
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<h3>Edit Team</h3>
+
+@if (team == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="mb-3">
+        <label>Name:</label>
+        <input @bind="team.Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>City:</label>
+        <input @bind="team.City" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Coach:</label>
+        <input @bind="team.Coach" class="form-control" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="UpdateTeam">Save Changes</button>
+    <button class="btn btn-secondary" @onclick="@(() => Nav.NavigateTo("/teams"))">Cancel</button>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Team? team;
+
+    protected override async Task OnInitializedAsync()
+    {
+        team = await Http.GetFromJsonAsync<Team>($"api/teams/{id}");
+    }
+
+    private async Task UpdateTeam()
+    {
+        var response = await Http.PutAsJsonAsync($"api/teams/{id}", team);
+        if (response.IsSuccessStatusCode)
+        {
+            Nav.NavigateTo("/teams");
+        }
+    }
+}
