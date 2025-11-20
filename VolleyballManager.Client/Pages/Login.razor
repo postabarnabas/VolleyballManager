@@ -1,0 +1,90 @@
+﻿@page "/login"
+@using VolleyballManager.Client.Models
+@using VolleyballManager.Client.Services
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@inject AuthService AuthService
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h3 class="text-center mb-4">Bejelentkezés</h3>
+
+        <div class="card">
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="alert alert-danger">@ErrorMessage</div>
+                }
+
+                <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <InputText @bind-Value="loginModel.Email" class="form-control" />
+                        <ValidationMessage For="@(() => loginModel.Email)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Jelszó</label>
+                        <InputText type="password" @bind-Value="loginModel.Password" class="form-control" />
+                        <ValidationMessage For="@(() => loginModel.Password)" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                        }
+                        Bejelentkezés
+                    </button>
+                </EditForm>
+
+                <div class="text-center mt-3">
+                    <small>Nincs fiókod? <a href="/register">Regisztrálj!</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private string? ErrorMessage;
+    private bool isLoading = false;
+
+    private async Task HandleLogin()
+    {
+        isLoading = true;
+        ErrorMessage = null;
+
+        try
+        {
+            var success = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
+
+            if (success)
+            {
+                Nav.NavigateTo("/", true);
+            }
+            else
+            {
+                ErrorMessage = "Hibás email vagy jelszó!";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Hiba a bejelentkezés során!";
+            await JS.InvokeVoidAsync("console.error", ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    public class LoginModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}

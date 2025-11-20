@@ -1,0 +1,92 @@
+﻿@page "/register"
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h3 class="text-center mb-4">Regisztráció</h3>
+
+        <div class="card">
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(SuccessMessage))
+                {
+                    <div class="alert alert-success">@SuccessMessage</div>
+                }
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="alert alert-danger">@ErrorMessage</div>
+                }
+
+                <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <InputText @bind-Value="registerModel.Email" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Jelszó</label>
+                        <InputText type="password" @bind-Value="registerModel.Password" class="form-control" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                        }
+                        Regisztráció
+                    </button>
+                </EditForm>
+
+                <div class="text-center mt-3">
+                    <small>Már van fiókod? <a href="/login">Jelentkezz be!</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterModel registerModel = new();
+    private string? SuccessMessage;
+    private string? ErrorMessage;
+    private bool isLoading = false;
+
+    private async Task HandleRegister()
+    {
+        isLoading = true;
+        ErrorMessage = null;
+        SuccessMessage = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/register", registerModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                SuccessMessage = "Sikeres regisztráció! Most már bejelentkezhetsz.";
+                registerModel = new RegisterModel();
+            }
+            else
+            {
+                ErrorMessage = "Sikertelen regisztráció!";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Hiba a regisztráció során!";
+            await JS.InvokeVoidAsync("console.error", ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    public class RegisterModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}
