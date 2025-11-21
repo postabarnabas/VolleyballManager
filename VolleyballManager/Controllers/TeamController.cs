@@ -8,7 +8,7 @@ namespace VolleyballManager.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // 🔹 EZ HIÁNYZOTT!
+    [Authorize]
     public class TeamsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -18,7 +18,6 @@ namespace VolleyballManager.Controllers
             _context = context;
         }
 
-        // GET: api/teams - bárki láthatja
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
@@ -28,7 +27,6 @@ namespace VolleyballManager.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/teams/5 - bárki láthatja
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<Team>> GetTeam(int id)
@@ -43,7 +41,6 @@ namespace VolleyballManager.Controllers
             return team;
         }
 
-        // POST: api/teams - CSAK ADMIN
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Team>> PostTeam(Team team)
@@ -57,7 +54,6 @@ namespace VolleyballManager.Controllers
             return CreatedAtAction(nameof(GetTeam), new { id = team.Id }, team);
         }
 
-        // PUT: api/teams/5 - CSAK ADMIN
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutTeam(int id, Team team)
@@ -87,7 +83,6 @@ namespace VolleyballManager.Controllers
             return NoContent();
         }
 
-        // DELETE: api/teams/5 - CSAK ADMIN
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTeam(int id)

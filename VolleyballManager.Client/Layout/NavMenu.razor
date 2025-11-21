@@ -24,7 +24,7 @@
             </NavLink>
         </div>
 
-        <!-- 🔹 CSAK ADMIN vagy BEJELENTKEZETT USER láthatja -->
+        <!-- admin v user láthatja -->
         @if (isAuthenticated)
         {
             <div class="nav-item px-3">
@@ -40,7 +40,7 @@
             </NavLink>
         </div>
 
-        <!-- 🔹 CSAK ADMIN vagy BEJELENTKEZETT USER láthatja -->
+        <!-- admin v user láthatja -->
         @if (isAuthenticated)
         {
             <div class="nav-item px-3">
@@ -50,7 +50,6 @@
             </div>
         }
 
-        <!-- 🔹 AUTH SECTION - Login/Register vagy User info + Logout -->
         @if (!isAuthenticated)
         {
             <div class="nav-item px-3">

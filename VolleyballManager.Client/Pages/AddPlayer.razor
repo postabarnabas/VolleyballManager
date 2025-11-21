@@ -43,7 +43,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Betölti a csapatokat a legördülőhöz
         teams = await Http.GetFromJsonAsync<List<Team>>("api/teams");
     }
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization; // 🔹 szükséges
+using Microsoft.AspNetCore.Authorization;
 using VolleyballManager.Data;
 using VolleyballManager.Models;
 
@@ -8,7 +8,7 @@ namespace VolleyballManager.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // 🔹 alapértelmezetten mindenes kell
+    [Authorize]
     public class PlayersController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -18,7 +18,6 @@ namespace VolleyballManager.Controllers
             _context = context;
         }
 
-        // 🔹 Bárki lekérheti
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<Player>>> GetPlayers()
@@ -28,7 +27,6 @@ namespace VolleyballManager.Controllers
                 .ToListAsync();
         }
 
-        // 🔹 Bárki lekérheti
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<Player>> GetPlayer(int id)
@@ -43,7 +41,6 @@ namespace VolleyballManager.Controllers
             return player;
         }
 
-        // 🔹 Csak admin hozhat létre új játékost
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Player>> PostPlayer(Player player)
@@ -58,7 +55,6 @@ namespace VolleyballManager.Controllers
             return CreatedAtAction(nameof(GetPlayer), new { id = player.Id }, player);
         }
 
-        // 🔹 Csak admin módosíthat
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutPlayer(int id, Player player)
@@ -76,7 +72,6 @@ namespace VolleyballManager.Controllers
             return NoContent();
         }
 
-        // 🔹 Csak admin törölhet
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeletePlayer(int id)

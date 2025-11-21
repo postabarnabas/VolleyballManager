@@ -9,16 +9,13 @@ using VolleyballManager.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DBContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// JWT config
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
 
@@ -44,7 +41,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Controllers + Json options
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>
     {
@@ -57,7 +53,6 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<TokenService>();
 
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient",
@@ -77,7 +72,6 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowBlazorClient");
 app.UseHttpsRedirection();
 
-// FONTOS: Elõbb Authentication, utána Authorization!
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -98,9 +92,8 @@ async Task CreateRolesAndAdminAsync(WebApplication app)
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    // Opcionális: alap admin felhasználó létrehozása (csak dev célra)
     var adminEmail = "admin@volley.local";
-    var adminPassword = "Admin123!"; // változtasd meg, ne maradjon így élesben
+    var adminPassword = "Admin123!";
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
@@ -114,6 +107,5 @@ async Task CreateRolesAndAdminAsync(WebApplication app)
     }
 }
 
-// Program build rész után, app létrehozása után, de még app.Run() elõtt:
 await CreateRolesAndAdminAsync(app);
 app.Run();

@@ -22,9 +22,6 @@ namespace VolleyballManager.Controllers
             _tokenService = tokenService;
         }
 
-        // ========================
-        //   REGISTRATION
-        // ========================
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto model)
         {
@@ -42,9 +39,6 @@ namespace VolleyballManager.Controllers
             return Ok(new { message = "Registration successful" });
         }
 
-        // ========================
-        //   LOGIN
-        // ========================
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto model)
         {
@@ -66,9 +60,6 @@ namespace VolleyballManager.Controllers
         }
     }
 
-    // ================
-    // DTO CLASSES
-    // ================
     public class RegisterDto
     {
         public string Email { get; set; } = default!;

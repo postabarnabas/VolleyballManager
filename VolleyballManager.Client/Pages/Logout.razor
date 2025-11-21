@@ -5,10 +5,8 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        // Token törlése
         await JS.InvokeVoidAsync("localStorage.removeItem", "authToken");
 
-        // Átirányítás a login oldalra
         Nav.NavigateTo("/login", true);
     }
 }
