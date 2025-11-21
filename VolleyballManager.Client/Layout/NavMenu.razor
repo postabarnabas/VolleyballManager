@@ -1,6 +1,9 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">VolleyballManager.Client</a>
+        <a class="navbar-brand" href="">VolleyballManager</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -20,41 +23,91 @@
                 <span class="bi bi-people" aria-hidden="true"></span> Teams
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="teams/add">
-                <span class="oi oi-plus" aria-hidden="true"></span> Add Team
-            </NavLink>
-        </div>
+
+        <!-- 🔹 CSAK ADMIN vagy BEJELENTKEZETT USER láthatja -->
+        @if (isAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="teams/add">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Add Team
+                </NavLink>
+            </div>
+        }
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="players">
                 <span class="oi oi-people" aria-hidden="true"></span> Players
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="players/add">
-                <span class="oi oi-people" aria-hidden="true"></span> Add Player
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/login">
-                <span class="oi oi-people" aria-hidden="true"></span> Login
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/register">
-                <span class="oi oi-people" aria-hidden="true"></span> Register
-            </NavLink>
-        </div>
+
+        <!-- 🔹 CSAK ADMIN vagy BEJELENTKEZETT USER láthatja -->
+        @if (isAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="players/add">
+                    <span class="oi oi-plus" aria-hidden="true"></span> Add Player
+                </NavLink>
+            </div>
+        }
+
+        <!-- 🔹 AUTH SECTION - Login/Register vagy User info + Logout -->
+        @if (!isAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/login">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Login
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/register">
+                    <span class="oi oi-person" aria-hidden="true"></span> Register
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3">
+                <div class="nav-link text-info">
+                    <span class="oi oi-check" aria-hidden="true"></span>
+                    Bejelentkezve
+                </div>
+            </div>
+            <div class="nav-item px-3">
+                <a class="nav-link text-warning" href="/logout" @onclick="HandleLogout">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span> Logout
+                </a>
+            </div>
+        }
     </nav>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
+    private bool isAuthenticated = false;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckAuthStatus();
+    }
+
+    private async Task CheckAuthStatus()
+    {
+        var token = await JS.InvokeAsync<string?>("localStorage.getItem", "authToken");
+        isAuthenticated = !string.IsNullOrEmpty(token);
+        StateHasChanged();
+    }
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task HandleLogout()
+    {
+        await JS.InvokeVoidAsync("localStorage.removeItem", "authToken");
+        isAuthenticated = false;
+        Nav.NavigateTo("/login", true);
     }
 }
